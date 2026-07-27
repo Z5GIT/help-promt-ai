@@ -1,0 +1,88 @@
+// CONTEXT: Complete Telegram Bot API Keyboards & Buttons (Python/aiogram 3.x)
+// TARGET: AI Context Engine (Z5GIT)
+
+[1. ReplyKeyboardMarkup (Bottom Keyboards)]
+Usage: Custom keyboards replacing standard UI keyboard.
+
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonRequestUser, KeyboardButtonRequestChat
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
+
+# Standard & Colored Buttons
+# Style colors (primary/success/danger) depend on client/custom wrapper support
+reply_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="🔵 Primary", style="primary"), KeyboardButton(text="🟢 Success", style="success")],
+        [KeyboardButton(text="🔴 Danger", style="danger")]
+    ],
+    resize_keyboard=True,       # Auto-fit screen size
+    one_time_keyboard=True,    # Hide keyboard after button click
+    is_persistent=True,        # Keep visible during text typing
+    input_field_placeholder="Choose an option..."
+)
+
+# Advanced Requests (Contact, Location, Users, Chats)
+request_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📱 Share Contact", request_contact=True)],
+        [KeyboardButton(text="📍 Share Location", request_location=True)],
+        # Request specific User/Chat ID from user
+        [KeyboardButton(text="👤 Pick User", request_user=KeyboardButtonRequestUser(request_id=1, user_is_bot=False))],
+        [KeyboardButton(text="📢 Pick Channel", request_chat=KeyboardButtonRequestChat(request_id=2, chat_is_channel=True))]
+    ],
+    resize_keyboard=True
+)
+
+# Dynamic Reply Keyboard Builder (Best Practice for dynamic rows)
+builder = ReplyKeyboardBuilder()
+for i in range(1, 7):
+    builder.button(text=f"Option {i}")
+builder.adjust(2, 3, 1)  # Layout: 2 buttons in row 1, 3 in row 2, 1 in row 3
+# Send: reply_markup=builder.as_markup(resize_keyboard=True)
+
+
+[2. InlineKeyboardMarkup (Glass/Message Keyboards)]
+Usage: Attached directly to messages.
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LoginUrl
+from aiogram.types.web_app_info import WebAppInfo
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+# Complete Inline Button Types
+inline_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        # 1. Callback Button (Max 64 bytes callback_data)
+        [InlineKeyboardButton(text="🔘 Action", callback_data="act_1")],
+        
+        # 2. Hyperlink URL
+        [InlineKeyboardButton(text="🔗 Open Link", url="https://example.com")],
+        
+        # 3. WebApp / Mini App (Modern Telegram Update)
+        [InlineKeyboardButton(text="🚀 Mini App", web_app=WebAppInfo(url="https://webapp.example.com"))],
+        
+        # 4. Inline Query Switchers
+        [InlineKeyboardButton(text="💬 Share in Chat", switch_inline_query="search_query")],
+        [InlineKeyboardButton(text="💬 Share Here", switch_inline_query_current_chat="search_query")],
+        
+        # 5. Telegram Web Login
+        [InlineKeyboardButton(text="🔐 Login", login_url=LoginUrl(url="https://example.com/login"))],
+        
+        # 6. Payment Button (Must be first button in row for invoice messages)
+        [InlineKeyboardButton(text="💳 Pay Now", pay=True)]
+    ]
+)
+
+# Dynamic Inline Keyboard Builder
+inline_builder = InlineKeyboardBuilder()
+inline_builder.button(text="Prev", callback_data="page_prev")
+inline_builder.button(text="Next", callback_data="page_next")
+inline_builder.button(text="Cancel", callback_data="cancel")
+inline_builder.adjust(2, 1)  # Row 1: [Prev][Next], Row 2: [Cancel]
+# Send: reply_markup=inline_builder.as_markup()
+
+
+[3. Keyboard Utilities]
+from aiogram.types import ReplyKeyboardRemove
+
+# Remove bottom reply keyboard
+# Send: reply_markup=ReplyKeyboardRemove()
+
