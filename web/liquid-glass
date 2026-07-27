@@ -1,0 +1,130 @@
+// CONTEXT: Apple-Style Liquid Glass UI (CSS/JS Web Standards)
+// TARGET: AI Context Engine (Z5GIT)
+// PURPOSE: Direct AI models to generate realistic, fluid Apple "Liquid Glass" interfaces.
+// DESIGN PRINCIPLES: Multi-layer depth, dynamic refraction, specular rim lights, liquid SVG displacement, high contrast legibility.
+
+[1. DESIGN TOKENS & SYSTEM VARIABLES]
+/* Global tokens for light and dark liquid glass states */
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.18);
+  --glass-bg-dark: rgba(18, 18, 22, 0.45);
+  --glass-border-light: rgba(255, 255, 255, 0.35);
+  --glass-border-dark: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(28px) saturate(210%) contrast(102%);
+  --glass-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25), 
+                 inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.5), 
+                 inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.15);
+  --liquid-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[2. BASE LIQUID GLASS PANEL (CORE CSS)]
+.liquid-glass-card {
+  position: relative;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 28px;
+  border: 1px solid var(--glass-border-light);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transform: translateZ(0); /* GPU Acceleration */
+  transition: transform 0.4s var(--liquid-ease), box-shadow 0.4s var(--liquid-ease), background 0.4s var(--liquid-ease);
+}
+
+/* Dark mode auto-switch */
+@media (prefers-color-scheme: dark) {
+  .liquid-glass-card {
+    background: var(--glass-bg-dark);
+    border-color: var(--glass-border-dark);
+  }
+}
+
+/* Top Edge Specular Reflection (Specular Light Sweep) */
+.liquid-glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  border-radius: 28px 28px 0 0;
+}
+
+[3. LIQUID REFRACTION & FLUID MORPHING EFFECTS]
+/* SVG Distortion Filter for Liquid Refraction Effect */
+/* Include this inline SVG in HTML body once:
+<svg style="display:none;">
+  <filter id="liquid-refract">
+    <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+*/
+
+.liquid-distort {
+  filter: url(#liquid-refract);
+  transition: filter 0.3s ease;
+}
+
+/* Hover Liquid Ripple & Expansion */
+.liquid-glass-card:hover {
+  transform: translateY(-4px) scale(1.012);
+  box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.35), 
+              inset 0 1px 2px 0 rgba(255, 255, 255, 0.7), 
+              inset 0 -1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+[4. INTERACTIVE LIQUID COMPONENTS]
+
+/* A. Liquid Glass Button */
+.liquid-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 9999px; /* Pill shape */
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transition: all 0.3s var(--liquid-ease);
+}
+.liquid-button:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* B. Mouse Cursor Dynamic Light Tracking (JS) */
+/*
+JS Implementation for Real-Time Specular Tracking:
+document.querySelectorAll('.liquid-glass-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  });
+});
+CSS for Dynamic Highlight:
+.liquid-glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.25), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.liquid-glass-card:hover::after { opacity: 1; }
+*/
+
+[5. AI CODING RULES & PERFORMANCE CONSTRAINTS]
+1. ALWAYS use `backdrop-filter` with fallback: `@supports not (backdrop-filter: blur(1px)) { background: rgba(255,255,255,0.85); }`
+2. NEVER use heavy blur values (>40px) on scrolling lists to avoid mobile GPU lag.
+3. Keep text high-contrast: Use dark typography (`#0f0f11`) on light glass or pure white (`#ffffff`) on dark glass.
+4. Apply `transform: translateZ(0)` or `will-change: transform` on animated liquid glass components for 60fps rendering.
